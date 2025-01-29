@@ -1,5 +1,6 @@
 <?php
-
+use MediaWiki\Http\HttpRequestFactory;
+use MediaWiki\MediaWikiServices;
 	class FirebaseHooks {
 
 		public static function onBeforePageDisplay(&$out, &$skin) {
@@ -9,12 +10,12 @@
  	
 		public static function onParserFirstCallInit( Parser $parser ) {	        
 			$parser->setHook( 'firebase', 'FirebaseHooks::wfFirebaseRender' );
-			$parser->setFunctionTagHook( 'firebaseraw', 'FirebaseHooks::wfFirebaseRenderRaw', '' );
+			$parser->setHook( 'firebaseraw', 'FirebaseHooks::wfFirebaseRenderRaw' );
        		return true;
 		}
 
 		// raw replaces the firebase tag with plain text read from the firebase reference once
-		public static function wfFirebaseRenderRaw( Parser $parser, PPFrame $frame, $input, array $args ) {	       
+		public static function wfFirebaseRenderRaw( $input, array $args, Parser $parser, PPFrame $frame ) {	   
 	    	// parse the url arg in case it is provided through templating, nested tags, etc.
 	    	$parsedURL = $parser->replaceVariables( $args['url'], $frame );
 			
@@ -23,7 +24,8 @@
 			$parsedURL = $parsedURL . '.json';
 
 			wfDebugLog( 'Firebase', 'entered raw case with url = ' .  $parsedURL);
-			$firebaseGET = Http::request('GET',$parsedURL);
+            $httpRequestFactory = MediaWikiServices::getInstance()->getHttpRequestFactory();
+            $firebaseGET = $httpRequestFactory->get($parsedURL, []);
 			wfDebugLog( 'Firebase', 'Http request returned: ' . $firebaseGET );
 			if($firebaseGET) {
 				$firebaseGET = str_replace('"', "", $firebaseGET);

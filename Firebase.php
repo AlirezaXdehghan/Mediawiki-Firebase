@@ -14,7 +14,7 @@
 $wgExtensionCredits['parserhook'][] = array(
         'path'           => __FILE__,
         'name'           => 'Firebase',
-        'version'        => '1.0',
+        'version'        => '1.1',
         'author'         => 'Benny Lichtner', 
         'url'            => 'https://www.mediawiki.org/wiki/Extension:Firebase',
         'descriptionmsg' => 'firebase-desc',
